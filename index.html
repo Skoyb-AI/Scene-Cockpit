@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scene Cockpit</title>
+<style>
+  :root {
+    --bg: #14181B;
+    --surface: #1B2124;
+    --accent: #4C7A73;
+    --text: #EDE6D9;
+    --muted: #9CA6A3;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 24px 16px 64px;
+    line-height: 1.5;
+  }
+
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-top: 0;
+    margin-bottom: 24px;
+  }
+
+  section {
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  section h2 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    margin-top: 16px;
+  }
+
+  label:first-of-type {
+    margin-top: 0;
+  }
+
+  input[type="text"],
+  input[type="password"],
+  textarea,
+  select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid #2A3236;
+    border-radius: 6px;
+    color: var(--text);
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+  }
+
+  input[type="text"]:focus,
+  input[type="password"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: 1px solid var(--accent);
+    border-color: var(--accent);
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  #scenePurpose {
+    min-height: 70px;
+  }
+
+  #sceneText {
+    min-height: 220px;
+  }
+
+  .hint {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-top: 4px;
+  }
+
+  button {
+    background: var(--accent);
+    color: var(--text);
+    border: none;
+    border-radius: 6px;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+
+  button:hover {
+    filter: brightness(1.1);
+  }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  #questionsOutput {
+    margin-top: 20px;
+    display: none;
+  }
+
+  #questionsOutput ol {
+    padding-left: 20px;
+  }
+
+  #questionsOutput li {
+    margin-bottom: 8px;
+  }
+
+  #logList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .log-empty {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Scene Cockpit</h1>
+  <p class="subtitle">Log a scene, get 3 questions anchored in your stated purpose. No suggestions, no rewrites.</p>
+
+  <section id="apiKeySection">
+    <h2>API Key</h2>
+    <label for="apiKey">Anthropic API key</label>
+    <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off" />
+    <p class="hint">Kept in memory for this session only. Never saved to local storage, never sent anywhere but the Anthropic API.</p>
+  </section>
+
+  <section id="sceneFormSection">
+    <h2>Scene Record</h2>
+    <form id="sceneForm">
+      <label for="scenePurpose">Scene purpose (what must this scene achieve?)</label>
+      <textarea id="scenePurpose"></textarea>
+
+      <label for="pov">POV</label>
+      <select id="pov">
+        <option value="First Person">First Person</option>
+        <option value="Third Limited">Third Limited</option>
+        <option value="Third Omniscient">Third Omniscient</option>
+      </select>
+
+      <label for="characters">Characters present (comma separated)</label>
+      <input type="text" id="characters" placeholder="e.g. Mira, Corin" />
+
+      <label for="beat">Story beat</label>
+      <select id="beat">
+        <option value="Hook">Hook</option>
+        <option value="Inciting Incident">Inciting Incident</option>
+        <option value="Rising Action">Rising Action</option>
+        <option value="Climax">Climax</option>
+        <option value="Resolution">Resolution</option>
+      </select>
+
+      <label for="sceneText">Scene text (paste completed scene here)</label>
+      <textarea id="sceneText"></textarea>
+      <p class="hint">This text is used only for this session — it is never saved.</p>
+
+      <button type="submit" id="reflectButton">Reflect</button>
+    </form>
+
+    <div id="questionsOutput">
+      <h2>Questions</h2>
+      <ol id="questionsList"></ol>
+    </div>
+  </section>
+
+  <section id="logSection">
+    <h2>Session Log</h2>
+    <ul id="logList">
+      <li class="log-empty">No records yet.</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>
