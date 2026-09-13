@@ -155,6 +155,73 @@
     font-size: 0.9rem;
   }
 
+  .log-entry {
+    border: 1px solid #2A3236;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .log-entry-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .log-entry-toggle {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text);
+    text-align: left;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .log-entry-toggle .log-date {
+    color: var(--muted);
+    font-size: 0.8rem;
+    display: block;
+  }
+
+  .log-entry-delete {
+    background: none;
+    border: 1px solid #2A3236;
+    color: var(--muted);
+    padding: 6px 10px;
+    margin: 0;
+    font-size: 0.8rem;
+    border-radius: 6px;
+  }
+
+  .log-entry-delete:hover {
+    color: var(--text);
+    border-color: var(--muted);
+  }
+
+  .log-entry-details {
+    padding: 0 14px 14px;
+    border-top: 1px solid #2A3236;
+  }
+
+  .log-entry-details[hidden] {
+    display: none;
+  }
+
+  .log-entry-details ol {
+    padding-left: 20px;
+    margin: 12px 0 0;
+  }
+
+  .log-entry-meta {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin: 12px 0 0;
+  }
+
   .error {
     color: #E0A15A;
     font-size: 0.85rem;
@@ -228,11 +295,121 @@
     "own narrative preferences. Return only the 3 questions, numbered, nothing else.";
   const REFLECT_MODEL = "claude-sonnet-5";
 
+  const LOG_STORAGE_KEY = "sceneCockpitLog";
+
   const sceneForm = document.getElementById("sceneForm");
   const reflectButton = document.getElementById("reflectButton");
   const reflectError = document.getElementById("reflectError");
   const questionsOutput = document.getElementById("questionsOutput");
   const questionsList = document.getElementById("questionsList");
+  const logList = document.getElementById("logList");
+
+  function loadRecords() {
+    try {
+      const raw = localStorage.getItem(LOG_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function saveRecords(records) {
+    localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(records));
+  }
+
+  function makeId() {
+    return (window.crypto && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : Date.now() + "-" + Math.random().toString(16).slice(2);
+  }
+
+  function countWords(text) {
+    const trimmed = text.trim();
+    return trimmed ? trimmed.split(/\s+/).length : 0;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function deleteRecord(id) {
+    saveRecords(loadRecords().filter((record) => record.id !== id));
+    renderLog();
+  }
+
+  function addRecord(record) {
+    const records = loadRecords();
+    records.push(record);
+    saveRecords(records);
+    renderLog();
+  }
+
+  function renderLog() {
+    const records = loadRecords();
+    logList.innerHTML = "";
+
+    if (records.length === 0) {
+      const li = document.createElement("li");
+      li.className = "log-empty";
+      li.textContent = "No records yet.";
+      logList.appendChild(li);
+      return;
+    }
+
+    records.slice().reverse().forEach((record) => {
+      const li = document.createElement("li");
+      li.className = "log-entry";
+
+      const header = document.createElement("div");
+      header.className = "log-entry-header";
+
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "log-entry-toggle";
+      toggle.innerHTML = "<span class=\"log-date\">" + escapeHtml(record.date) +
+        " · " + escapeHtml(record.beat) + "</span>" + escapeHtml(record.purpose);
+
+      const details = document.createElement("div");
+      details.className = "log-entry-details";
+      details.hidden = true;
+
+      toggle.addEventListener("click", () => {
+        details.hidden = !details.hidden;
+      });
+
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.className = "log-entry-delete";
+      deleteButton.textContent = "Delete";
+      deleteButton.addEventListener("click", () => {
+        deleteRecord(record.id);
+      });
+
+      header.appendChild(toggle);
+      header.appendChild(deleteButton);
+
+      const meta = document.createElement("p");
+      meta.className = "log-entry-meta";
+      meta.textContent = "POV: " + record.pov + " · Characters: " +
+        (record.characters || "—") + " · Words: " + record.wordCount;
+
+      const ol = document.createElement("ol");
+      record.questions.forEach((question) => {
+        const qLi = document.createElement("li");
+        qLi.textContent = question;
+        ol.appendChild(qLi);
+      });
+
+      details.appendChild(meta);
+      details.appendChild(ol);
+
+      li.appendChild(header);
+      li.appendChild(details);
+      logList.appendChild(li);
+    });
+  }
 
   function showError(message) {
     reflectError.textContent = message;
@@ -321,6 +498,17 @@
         questionsList.appendChild(li);
       });
       questionsOutput.style.display = "block";
+
+      addRecord({
+        id: makeId(),
+        date: new Date().toLocaleDateString(),
+        purpose: scenePurpose,
+        pov: document.getElementById("pov").value,
+        characters: document.getElementById("characters").value.trim(),
+        beat: document.getElementById("beat").value,
+        wordCount: countWords(sceneText),
+        questions: questions
+      });
     } catch (err) {
       showError("Reflect failed: " + err.message);
     } finally {
@@ -328,6 +516,8 @@
       reflectButton.textContent = "Reflect";
     }
   });
+
+  renderLog();
 </script>
 </body>
 </html>
