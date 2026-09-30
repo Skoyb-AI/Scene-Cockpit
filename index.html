@@ -8,9 +8,12 @@
   :root {
     --bg: #14181B;
     --surface: #1B2124;
+    --surface-hover: #222a2e;
     --accent: #4C7A73;
+    --accent-light: #6ba89f;
     --text: #EDE6D9;
     --muted: #9CA6A3;
+    --border: #2A3236;
   }
 
   * {
@@ -40,7 +43,41 @@
     color: var(--muted);
     font-size: 0.9rem;
     margin-top: 0;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
+  }
+
+  /* Educational Banner */
+  .primer-card {
+    background: #172023;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    font-size: 0.88rem;
+  }
+
+  .primer-card h3 {
+    margin: 0 0 6px 0;
+    font-size: 0.95rem;
+    color: var(--accent-light);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .primer-card p {
+    margin: 0 0 8px 0;
+    color: var(--text);
+  }
+
+  .primer-card ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--muted);
+  }
+
+  .primer-card li {
+    margin-bottom: 4px;
   }
 
   section {
@@ -62,12 +99,36 @@
   label {
     display: block;
     font-size: 0.9rem;
-    margin-bottom: 6px;
-    margin-top: 16px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    margin-top: 18px;
   }
 
   label:first-of-type {
     margin-top: 0;
+  }
+
+  /* Collapsible Coaching Accordions */
+  details.coach-tip {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+
+  details.coach-tip summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--accent-light);
+    user-select: none;
+  }
+
+  details.coach-tip p {
+    margin: 6px 0 2px 0;
+    line-height: 1.4;
   }
 
   input[type="text"],
@@ -76,11 +137,11 @@
   select {
     width: 100%;
     background: var(--bg);
-    border: 1px solid #2A3236;
+    border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--text);
     padding: 10px 12px;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     font-family: inherit;
   }
 
@@ -97,7 +158,7 @@
   }
 
   #scenePurpose {
-    min-height: 70px;
+    min-height: 80px;
   }
 
   #sceneText {
@@ -120,10 +181,11 @@
     font-weight: 600;
     cursor: pointer;
     margin-top: 20px;
+    transition: filter 0.15s ease;
   }
 
   button:hover {
-    filter: brightness(1.1);
+    filter: brightness(1.15);
   }
 
   button:disabled {
@@ -132,8 +194,16 @@
   }
 
   #questionsOutput {
-    margin-top: 20px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
     display: none;
+  }
+
+  #questionsOutput h3 {
+    margin-top: 0;
+    font-size: 1rem;
+    color: var(--accent-light);
   }
 
   #questionsOutput ol {
@@ -141,7 +211,8 @@
   }
 
   #questionsOutput li {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    line-height: 1.4;
   }
 
   #logList {
@@ -156,7 +227,7 @@
   }
 
   .log-entry {
-    border: 1px solid #2A3236;
+    border: 1px solid var(--border);
     border-radius: 6px;
     margin-bottom: 10px;
     overflow: hidden;
@@ -185,11 +256,12 @@
     color: var(--muted);
     font-size: 0.8rem;
     display: block;
+    margin-bottom: 2px;
   }
 
   .log-entry-delete {
     background: none;
-    border: 1px solid #2A3236;
+    border: 1px solid var(--border);
     color: var(--muted);
     padding: 6px 10px;
     margin: 0;
@@ -204,7 +276,7 @@
 
   .log-entry-details {
     padding: 0 14px 14px;
-    border-top: 1px solid #2A3236;
+    border-top: 1px solid var(--border);
   }
 
   .log-entry-details[hidden] {
@@ -233,50 +305,81 @@
 <body>
 <main>
   <h1>Scene Cockpit</h1>
-  <p class="subtitle">Log a scene, get 3 questions anchored in your stated purpose. No suggestions, no rewrites.</p>
+  <p class="subtitle">Log a scene, diagnose its dramatic engine, and get 3 targeted reflection questions.</p>
+
+  <!-- Educational Primer -->
+  <div class="primer-card">
+    <h3>💡 What is a scene?</h3>
+    <p>A scene is not just an exchange of dialogue or things happening in a room. A scene is a unit of <strong>change</strong>. By the end of a scene, a character's situation or state must shift from positive to negative (or vice versa).</p>
+    <ul>
+      <li><strong>Goal:</strong> Someone wants something specific right now.</li>
+      <li><strong>Conflict:</strong> An obstacle (person, environment, dilemma) gets in the way.</li>
+      <li><strong>Shift:</strong> The scene ends with a change, new stakes, or an unexpected outcome.</li>
+    </ul>
+  </div>
 
   <section id="apiKeySection">
     <h2>API Key</h2>
-    <label for="apiKey">Anthropic API key</label>
+    <label for="apiKey">Anthropic API Key</label>
     <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off" />
-    <p class="hint">Kept in memory for this session only. Never saved to local storage, never sent anywhere but the Anthropic API.</p>
+    <p class="hint">Stored in memory for this session only. Never saved or stored anywhere else.</p>
   </section>
 
   <section id="sceneFormSection">
     <h2>Scene Record</h2>
     <form id="sceneForm">
-      <label for="scenePurpose">Scene purpose (what must this scene achieve?)</label>
-      <textarea id="scenePurpose"></textarea>
 
-      <label for="pov">POV</label>
-      <select id="pov">
-        <option value="First Person">First Person</option>
-        <option value="Third Limited">Third Limited</option>
-        <option value="Third Omniscient">Third Omniscient</option>
-      </select>
+      <label for="scenePurpose">Scene Purpose</label>
+      <details class="coach-tip">
+        <summary>Coaching Tip: How to define scene purpose</summary>
+        <p>Avoid generic ideas like <em>"Show they like each other"</em> or <em>"Explain the backstory."</em> Instead, use the formula: <strong>"[Character] wants [X], but faces [Y], causing [State Shift]."</strong></p>
+      </details>
+      <textarea id="scenePurpose" placeholder="e.g. Corin attempts to extract the secret cipher from Mira, but she exposes his past betrayal, destroying his leverage."></textarea>
 
-      <label for="characters">Characters present (comma separated)</label>
-      <input type="text" id="characters" placeholder="e.g. Mira, Corin" />
-
-      <label for="beat">Story beat</label>
+      <label for="beat">Story Beat</label>
+      <details class="coach-tip">
+        <summary>Coaching Tip: Where does this sit in the story arc?</summary>
+        <p>• <strong>Hook:</strong> Establishes normalcy and grabs interest.<br>
+           • <strong>Inciting Incident:</strong> Disrupts the status quo; forces the character to act.<br>
+           • <strong>Rising Action:</strong> Obstacles mount; plans fail or become complicated.<br>
+           • <strong>Climax:</strong> Highest point of tension where the ultimate decision is made.<br>
+           • <strong>Resolution:</strong> The dust settles; reveals the new normal.</p>
+      </details>
       <select id="beat">
-        <option value="Hook">Hook</option>
-        <option value="Inciting Incident">Inciting Incident</option>
-        <option value="Rising Action">Rising Action</option>
-        <option value="Climax">Climax</option>
-        <option value="Resolution">Resolution</option>
+        <option value="Hook">Hook (First impression / status quo)</option>
+        <option value="Inciting Incident">Inciting Incident (The disruption)</option>
+        <option value="Rising Action" selected>Rising Action (Complications & obstacles)</option>
+        <option value="Climax">Climax (Peak tension / critical choice)</option>
+        <option value="Resolution">Resolution (Consequences / aftermath)</option>
       </select>
 
-      <label for="sceneText">Scene text (paste completed scene here)</label>
-      <textarea id="sceneText"></textarea>
-      <p class="hint">This text is used only for this session — it is never saved.</p>
+      <label for="pov">Point of View (POV)</label>
+      <details class="coach-tip">
+        <summary>Coaching Tip: Choosing your narrative lens</summary>
+        <p>• <strong>First Person (I/me):</strong> Immediate, intimate, but limited solely to what the narrator observes.<br>
+           • <strong>Third Limited (he/she/they):</strong> Tied tightly over the shoulder of one character's senses.<br>
+           • <strong>Third Omniscient:</strong> All-knowing narrator who can freely inspect anyone's thoughts.</p>
+      </details>
+      <select id="pov">
+        <option value="Third Limited" selected>Third Limited (Over one character's shoulder)</option>
+        <option value="First Person">First Person (Directly through "I")</option>
+        <option value="Third Omniscient">Third Omniscient (All-knowing observer)</option>
+      </select>
 
-      <button type="submit" id="reflectButton">Reflect</button>
+      <label for="characters">Characters Present</label>
+      <input type="text" id="characters" placeholder="e.g. Mira (focal character), Corin" />
+      <p class="hint">Identify who is driving the conversation or action versus who is reacting.</p>
+
+      <label for="sceneText">Scene Draft Text</label>
+      <textarea id="sceneText" placeholder="Paste your raw scene text here..."></textarea>
+      <p class="hint">Pasted text is evaluated only in memory for this session and is never stored.</p>
+
+      <button type="submit" id="reflectButton">Reflect on Scene</button>
       <p class="error" id="reflectError"></p>
     </form>
 
     <div id="questionsOutput">
-      <h2>Questions</h2>
+      <h3>Coach's Reflection Questions</h3>
       <ol id="questionsList"></ol>
     </div>
   </section>
@@ -289,10 +392,13 @@
   </section>
 </main>
 <script>
-  const REFLECT_SYSTEM_PROMPT = "You are a writing coach. Your only job is to return exactly 3 " +
-    "questions. Each question must be anchored in the writer's declared scene purpose. You must " +
-    "not suggest changes, offer alternatives, or rewrite any prose. You must not introduce your " +
-    "own narrative preferences. Return only the 3 questions, numbered, nothing else.";
+  const REFLECT_SYSTEM_PROMPT = "You are an encouraging but disciplined fiction writing coach helping a beginner writer understand the mechanics of a dramatic scene.\n" +
+    "A scene must contain a character goal, meaningful friction/conflict, and an emotional or situational value shift between the start and the end.\n\n" +
+    "Your task:\n" +
+    "Generate exactly 3 reflective questions tailored to their stated purpose and scene draft. " +
+    "Direct the questions to help them see whether their scene achieved its stated objective, maintained its POV, and produced a clear change or shift. " +
+    "Do NOT offer rewrites, suggest alternative plot lines, or make stylistic edits. " +
+    "Return only the numbered questions.";
   const REFLECT_MODEL = "claude-sonnet-5";
 
   const LOG_STORAGE_KEY = "sceneCockpitLog";
@@ -428,7 +534,7 @@
       .filter((line) => line.length > 0);
   }
 
-  async function callAnthropic(apiKey, scenePurpose, sceneText) {
+  async function callAnthropic(apiKey, scenePurpose, sceneText, beat, pov) {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -445,7 +551,7 @@
         messages: [
           {
             role: "user",
-            content: "Scene purpose:\n" + scenePurpose + "\n\nScene text:\n" + sceneText
+            content: `Intended Story Beat: ${beat}\nSelected POV: ${pov}\nScene Purpose: ${scenePurpose}\n\nScene Text:\n${sceneText}`
           }
         ]
       })
@@ -472,6 +578,8 @@
     const apiKey = document.getElementById("apiKey").value.trim();
     const scenePurpose = document.getElementById("scenePurpose").value.trim();
     const sceneText = document.getElementById("sceneText").value.trim();
+    const beat = document.getElementById("beat").value;
+    const pov = document.getElementById("pov").value;
 
     if (!apiKey) {
       showError("Enter your Anthropic API key above.");
@@ -490,7 +598,7 @@
     reflectButton.textContent = "Reflecting…";
 
     try {
-      const questions = await callAnthropic(apiKey, scenePurpose, sceneText);
+      const questions = await callAnthropic(apiKey, scenePurpose, sceneText, beat, pov);
       questionsList.innerHTML = "";
       questions.forEach((question) => {
         const li = document.createElement("li");
@@ -503,9 +611,9 @@
         id: makeId(),
         date: new Date().toLocaleDateString(),
         purpose: scenePurpose,
-        pov: document.getElementById("pov").value,
+        pov: pov,
         characters: document.getElementById("characters").value.trim(),
-        beat: document.getElementById("beat").value,
+        beat: beat,
         wordCount: countWords(sceneText),
         questions: questions
       });
@@ -513,7 +621,7 @@
       showError("Reflect failed: " + err.message);
     } finally {
       reflectButton.disabled = false;
-      reflectButton.textContent = "Reflect";
+      reflectButton.textContent = "Reflect on Scene";
     }
   });
 
